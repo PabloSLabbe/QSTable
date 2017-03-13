@@ -26,7 +26,7 @@ Until now just one tag is supported per expression. You can´t  mix in the same 
 Drag & drop the object onto a sheet (as you would do it with any other native object or visualization extension).
 Then define how the **QSTable** should behave:
 
-* Write a expression to choose an image to show on dimension
+* Write an expression to choose an image to show on dimension
 
 		=if(Type='GB','<img>arrow_upward_black.png','<img>arrow_downward_black.png')
 
@@ -36,11 +36,11 @@ Then define how the **QSTable** should behave:
 		   if(sum(Actual)sum(Target)<1,'<img>led_yellow.png',
 		   '<img>led_green.png'))
 
-* enable a hyperlink to open an App
+* Enable an hyperlink to open an App
 
         ='Open App<app>'&App
 
-* enable a hyperlink to open an external page
+* Enable an hyperlink to open an external page
 
         ='Open URL<url>'&URL
 	
