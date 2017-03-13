@@ -34,5 +34,48 @@ Then define how the **QSTable** should behave:
            if(sum(Actual)/sum(Target)\<1,'\<img>led_yellow.png',
              '\<img>led_green.png'))
 
+* enable a hyperlink to open an App
+
+        ='Open App\<app>'&App
+
+* enable a hyperlink to open an external page
+
+        ='Open URL\<url>'&URL
+	
+## Compatibility
+**QSTable** is designed to work with Qlik Sense 3.0.x or higher. It will not work in older versions.
+
+## Room for improvement / contribution
+* Mix image and target URL in the same column
+* Responsive layout for small screens
+* Freeze header
+
+Is there **anything else you'd like to see** in this visualization extension?
+
+* Don't hesitate to add the feature and create a pull request!
+* You don't have the time or skills to implement this specific feature? No problem, [drop a note here](https://github.com/stefanwalther/sense-navigation/issues).
+
+## Contributing
+Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](https://github.com/pabloslabbe/QSTable/issues).
+The process for contributing is outlined below:
+
+1. Create a fork of the project
+2. Work on whatever bug or feature you wish
+3. Create a pull request (PR)
+
+I cannot guarantee that I will merge all PRs but I will evaluate them all.
+
+## Author
+**Pablo Labbe**
+
+* [ANALITIKA Brasil](http://analitika.com.br) 
+* [Linkedin] (https://www.linkedin.com/in/pablolabbe)
+
+
+
+
+
+
+
 
 
