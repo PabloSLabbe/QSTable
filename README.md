@@ -42,6 +42,9 @@ Then define how the **QSTable** should behave:
 
         ='Open URL\<url>'&URL
 	
+* You can play with the css file to adjust color, font size, borders of the object
+	
+	
 ## Compatibility
 **QSTable** is designed to work with Qlik Sense 3.0.x or higher. It will not work in older versions.
 
@@ -49,6 +52,7 @@ Then define how the **QSTable** should behave:
 * Mix image and target URL in the same column
 * Responsive layout for small screens
 * Freeze header
+* Play with the css inside the object
 
 Is there **anything else you'd like to see** in this visualization extension?
 
@@ -71,11 +75,12 @@ I cannot guarantee that I will merge all PRs but I will evaluate them all.
 * [ANALITIKA Brasil](http://analitika.com.br) 
 * [Linkedin] (https://www.linkedin.com/in/pablolabbe)
 
+## Acknowledge
 
+Many pieces of this project was based or inpired by the work of others developers :
 
-
-
-
-
-
-
+ [Stefan Walther] (https://github.com/stefanwalther) - Documentation
+ [Erik Wetterberg] (https://github.com/erikwett/qsDynamicTable)  - Dynamic table
+ [Daniel Pilla] (https://github.com/danielpilla/sense-images-links-extension)  - Simple Table with Image/Link Detection
+ [Fady Heiba] (https://github.com/fadyheiba/Document-Chaining) - Document Chaining
+ 
