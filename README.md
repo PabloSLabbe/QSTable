@@ -26,6 +26,8 @@ Until now just one tag is supported per expression. You can´t  mix in the same 
 Drag & drop the object onto a sheet (as you would do it with any other native object or visualization extension).
 Then define how the **QSTable** should behave:
 
-Write an expression to choose an image if(Type='GB','<img>arrow_upward_black.png','<img>arrow_downward_black.png')
+* Write an expression to choose an image  to show 
+
+	* if(Type='GB','\<img>arrow_upward_black.png','\<img>arrow_downward_black.png')
 
 
