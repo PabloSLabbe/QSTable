@@ -28,19 +28,17 @@ Then define how the **QSTable** should behave:
 
 * Write an expression to choose an image  to show 
 
-	if(Type='GB','\<img>arrow_upward_black.png','\<img>arrow_downward_black.png')
-	
-	if(sum(Actual)/sum(Target)\<0.8,'\<img>led_red.png',
-           if(sum(Actual)/sum(Target)\<1,'\<img>led_yellow.png',
-             '\<img>led_green.png'))
+		=if(Type='GB','\<img>arrow_upward_black.png','\<img>arrow_downward_black.png')
+
+		=if(sum(Actual)/sum(Target)\<0.8,'\<img>led_red.png', if(sum(Actual)/sum(Target)\<1,'\<img>led_yellow.png','\<img>led_green.png'))
 
 * enable a hyperlink to open an App
 
-        ='Open App\<app>'&App
+        ='Open App<app>'&App
 
 * enable a hyperlink to open an external page
 
-        ='Open URL\<url>'&URL
+        ='Open URL<url>'&URL
 	
 * You can play with the css file to adjust color, font size, borders of the object
 	
