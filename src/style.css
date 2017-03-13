@@ -1,0 +1,24 @@
+.qv-object-QSTable div.qv-object-content-container {
+	overflow: auto;
+}
+.qv-object-QSTable td,
+.qv-object-QSTable th {
+	border-top: 10px solid #fff;
+	border-bottom: 10px solid #fff;
+	border-right: 10px solid #fff;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	vertical-align: middle;
+	cursor: default;
+	font-size: small;
+}
+.qv-object-QSTable td.numeric {
+	text-align: right;
+}
+.qv-object-QSTable td.image {
+ 	text-align: center;
+}
+.qv-object-QSTable button {
+	width: 100%;
+}
