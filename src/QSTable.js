@@ -1,5 +1,5 @@
 /*globals define*/
-define( ["qlik", "jquery", "text!./style.css"], function ( qlik, $, cssContent ) {
+define( ["qlik", "jquery", "text!./style.css", "//cdn.jsdelivr.net/jsbarcode/3.6.0/barcodes/JsBarcode.code39.min.js"], function ( qlik, $, cssContent ) {
 	'use strict';
 	$( "<style>" ).html( cssContent ).appendTo( "head" );
 
@@ -13,14 +13,14 @@ define( ["qlik", "jquery", "text!./style.css"], function ( qlik, $, cssContent )
 	  // Open a connection to QRS
 	  var global = qlik.getGlobal(config);
 
-	  var isDesktop = (config.port == "4848");	
+	  var isDesktop = (config.port == "4848");
 	  var appPathEncoded = "";
 
 	  // Get the app path for Qlik Sense Desktop
-	  if (isDesktop) { 
+	  if (isDesktop) {
 		var app = qlik.currApp(this);
 		var applicationId = app.id;
-		if(applicationId!=null){            
+		if(applicationId!=null){
 		  applicationId = applicationId.slice(0, applicationId.lastIndexOf("\\")+1);
 		  appPathEncoded = encodeURIComponent(applicationId);
 		};
@@ -32,10 +32,10 @@ define( ["qlik", "jquery", "text!./style.css"], function ( qlik, $, cssContent )
 
 	function createRows ( rows, dimensionInfo ) {
 		var html = "";
-		var ImgURL="/extensions/QSTable/images/"; 
-		
+		var ImgURL="/extensions/QSTable/images/";
+
 		var AppBaseURL = getAppBaseURL();
-		
+
 		rows.forEach( function ( row ) {
 			html += '<tr>';
 			row.forEach( function ( cell, key ) {
@@ -49,9 +49,12 @@ define( ["qlik", "jquery", "text!./style.css"], function ( qlik, $, cssContent )
 				if (cell.qText === undefined) {
 				 html += "'> </td>";
 				}
-				else 
+				else
 				{
-				  if(~cell.qText.toLowerCase().indexOf('<img>')){
+					if(~cell.qText.toLowerCase().indexOf('<barcode>')){
+					html += "'"+'> <svg class="barcode" jsbarcode-format="code39" jsbarcode-value="' + cell.qText.slice(9, cell.qText.length) + '" jsbarcode-textmargin="0" jsbarcode-fontoptions="bold"></svg></td>';
+				  }
+				  else if(~cell.qText.toLowerCase().indexOf('<img>')){
 					html += "image'"+'> <img src="'+ ImgURL + cell.qText.slice(5, cell.qText.length) + '" height=' + '15' + '></td>';
 				  }
 				  else if(~cell.qText.toLowerCase().indexOf('<url>')){
@@ -71,7 +74,7 @@ define( ["qlik", "jquery", "text!./style.css"], function ( qlik, $, cssContent )
 		} );
 		return html;
 	}
-	
+
 /**
 	 * Set column to be first in sort order
 	 * @param self The extension
@@ -125,7 +128,7 @@ define( ["qlik", "jquery", "text!./style.css"], function ( qlik, $, cssContent )
 		}
 		html += "</th>";
 		return html;
-	}	
+	}
 
 	return {
 		initialProperties: {
@@ -162,15 +165,15 @@ define( ["qlik", "jquery", "text!./style.css"], function ( qlik, $, cssContent )
 			canTakeSnapshot: true
 		},
 		paint: function ( $element, layout ) {
-			var html = "<table><thead><tr>", self = this,
+			var html = "<script> JsBarcode('.barcode').init(); </script><table><thead><tr>", self = this,
 				morebutton = false,
 				hypercube = layout.qHyperCube,
 				rowcount = hypercube.qDataPages[0].qMatrix.length,
 				dimcount = hypercube.qDimensionInfo.length,
 				colcount = hypercube.qDimensionInfo.length + hypercube.qMeasureInfo.length,
 				sortorder = hypercube.qEffectiveInterColumnSortOrder;
-			
-				
+
+
 			//render titles
 //			hypercube.qDimensionInfo.forEach( function ( cell ) {
 				//html += '<th>' + cell.qFallbackTitle + '</th>';
