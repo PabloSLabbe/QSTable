@@ -9,7 +9,7 @@ The Visualization Extension ***QSTable*** for Qlik Sense allows you to add a str
 * Open a Qlik Sense App poviding name of the QVF (desktop) or ID (server)
 * Open an external URL
 
-To use each of them, add to your expression the tag \<img>, \<app>, \<url>
+To use each of them, add to your expression the tag \<img>, \<barcode>, \<app>, \<url>
 
 Until now just one tag is supported per expression. You can´t  mix in the same expression an image  and a target url.
 
@@ -32,7 +32,7 @@ Then define how the **QSTable** should behave:
 
 * Write an expression to choose an image to show on measure
 
-		=if(sum(Actual)/sum(Target) < 0.8,'<img>led_red.png', 
+		=if(sum(Actual)/sum(Target) < 0.8,'<img>led_red.png',
 		   if(sum(Actual)sum(Target)<1,'<img>led_yellow.png',
 		   '<img>led_green.png'))
 
@@ -40,13 +40,17 @@ Then define how the **QSTable** should behave:
 
         ='Open App<app>'&App
 
+* Enable an Barcode (CODE39)
+
+        ='<barcode>'&Barcode
+
 * Enable an hyperlink to open an external page
 
         ='Open URL<url>'&URL
-	
+
 * You can play with the css file to adjust color, font size, borders of the object
-	
-	
+
+
 ## Compatibility
 **QSTable** is designed to work with Qlik Sense 3.0.x or higher. It will not work in older versions.
 
@@ -74,7 +78,7 @@ I cannot guarantee that I will merge all PRs but I will evaluate them all.
 ## Author
 **Pablo Labbe**
 
-* [ANALITIKA Brasil](http://analitika.com.br) 
+* [ANALITIKA Brasil](http://analitika.com.br)
 * [Linkedin] (https://www.linkedin.com/in/pablolabbe)
 
 ## Acknowledge
@@ -85,4 +89,3 @@ Many pieces of this project was based or inpired by the work of others developer
  [Erik Wetterberg] (https://github.com/erikwett/qsDynamicTable)  - Dynamic table
  [Daniel Pilla] (https://github.com/danielpilla/sense-images-links-extension)  - Simple Table with Image/Link Detection
  [Fady Heiba] (https://github.com/fadyheiba/Document-Chaining) - Document Chaining
- 
