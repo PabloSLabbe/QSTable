@@ -18,7 +18,7 @@
 }
 
 .qv-object-QSTable td.total {
-	text-align: right;
+	/*text-align: right;*/
 	font-weight: bold;
 }
 .qv-object-QSTable td.image {
