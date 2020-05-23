@@ -30,46 +30,108 @@ define( ["qlik", "jquery", "text!./style.css"], function ( qlik, $, cssContent )
 	};
 
 
-	function createRows ( rows, dimensionInfo ) {
+	
+	function  createTotal ( rows, dimensionInfo, measureInfo, labelTotal, totalTopBottom ) {
+
 		var html = "";
 		var ImgURL="/extensions/QSTable/images/"; 
 		
 		var AppBaseURL = getAppBaseURL();
+
+	
+		var tdTotal = "<tr>";
+		var tdTotalLabel=labelTotal;
+		
+		for(var i = 0;  i<dimensionInfo.length;i++){			
+			if(i==0)
+				tdTotal=tdTotal+"<td class='total"+"'>" + tdTotalLabel + '</td>';
+			else
+				tdTotal=tdTotal+"<td class='total"+"'>" + '</td>';
+		}
+		var hasTotal=false;
+		for(var i =0; i< measureInfo.length;i++){
+			tdTotal += "<td class='";
+			if ( !isNaN( measureInfo[i].qMax ) ) {
+					tdTotal += "numeric ";
+			}
+			if(measureInfo[i].totalMeasure===undefined){
+				tdTotal += "'> </td>";
+			}
+			else 
+			{
+			  if(measureInfo[i].totalMeasure !== "")
+				hasTotal=true;
+			  if(~measureInfo[i].totalMeasure.toLowerCase().indexOf('<img>')){
+				tdTotal += "image'"+'> <img src="'+ ImgURL + measureInfo[i].totalMeasure.slice(5, measureInfo[i].totalMeasure.length) + '" height=' + '15' + '></td>';
+			  }
+			  else if(~measureInfo[i].totalMeasure.toLowerCase().indexOf('<url>')){
+				var urlmark = measureInfo[i].totalMeasure.toLowerCase().indexOf('<url>');
+				tdTotal += "'"+'> <a href="' + measureInfo[i].totalMeasure.slice(urlmark+5, measureInfo[i].totalMeasure.length) + '" target="_blank">' + measureInfo[i].totalMeasure.slice(0,urlmark) + '</a></td>';
+			  }
+			  else if(~measureInfo[i].totalMeasure.toLowerCase().indexOf('<app>')){
+				var urlmark = measureInfo[i].totalMeasure.toLowerCase().indexOf('<app>');
+				tdTotal += "'"+'> <a href="' + AppBaseURL + measureInfo[i].totalMeasure.slice(urlmark+5, measureInfo[i].totalMeasure.length) + '" target="_blank">' + measureInfo[i].totalMeasure.slice(0,urlmark) + '</a></td>';
+			  }
+			  else {
+				tdTotal += "'>" + measureInfo[i].totalMeasure + '</td>';
+			  }
+			}
+		}
+		tdTotal+="</tr>";
+		if(hasTotal)
+			return tdTotal;
+		else
+			return "";
+		
+		
+	}
+	
+	
+	
+	function createRows ( rows, dimensionInfo, measureInfo, labelTotal, totalTopBottom ) {;
+		var ImgURL="/extensions/QSTable/images/"; 
+		
+		var AppBaseURL = getAppBaseURL();
+		
+
+		
+		var htmlRows="";
 		
 		rows.forEach( function ( row ) {
-			html += '<tr>';
+			htmlRows+="<tr>";
 			row.forEach( function ( cell, key ) {
 				if ( cell.qIsOtherCell ) {
 					cell.qText = dimensionInfo[key].othersLabel;
 				}
-				html += "<td class='";
+				htmlRows += "<td class='";
 				if ( !isNaN( cell.qNum ) ) {
-					html += "numeric ";
+					htmlRows += "numeric ";
 				}
 				if (cell.qText === undefined) {
-				 html += "'> </td>";
+				 htmlRows += "'> </td>";
 				}
 				else 
 				{
 				  if(~cell.qText.toLowerCase().indexOf('<img>')){
-					html += "image'"+'> <img src="'+ ImgURL + cell.qText.slice(5, cell.qText.length) + '" height=' + '15' + '></td>';
+					htmlRows += "image'"+'> <img src="'+ ImgURL + cell.qText.slice(5, cell.qText.length) + '" height=' + '15' + '></td>';
 				  }
 				  else if(~cell.qText.toLowerCase().indexOf('<url>')){
 					var urlmark = cell.qText.toLowerCase().indexOf('<url>');
-					html += "'"+'> <a href="' + cell.qText.slice(urlmark+5, cell.qText.length) + '" target="_blank">' + cell.qText.slice(0,urlmark) + '</a></td>';
+					htmlRows += "'"+'> <a href="' + cell.qText.slice(urlmark+5, cell.qText.length) + '" target="_blank">' + cell.qText.slice(0,urlmark) + '</a></td>';
 				  }
 				  else if(~cell.qText.toLowerCase().indexOf('<app>')){
 					var urlmark = cell.qText.toLowerCase().indexOf('<app>');
-					html += "'"+'> <a href="' + AppBaseURL + cell.qText.slice(urlmark+5, cell.qText.length) + '" target="_blank">' + cell.qText.slice(0,urlmark) + '</a></td>';
+					htmlRows += "'"+'> <a href="' + AppBaseURL + cell.qText.slice(urlmark+5, cell.qText.length) + '" target="_blank">' + cell.qText.slice(0,urlmark) + '</a></td>';
 				  }
 				  else {
-					html += "'>" + cell.qText + '</td>';
+					htmlRows += "'>" + cell.qText + '</td>';
 				  };
 				};
 			} );
-			html += '</tr>';
+			htmlRows += '</tr>';
 		} );
-		return html;
+		
+		return htmlRows;
 	}
 	
 /**
@@ -125,7 +187,43 @@ define( ["qlik", "jquery", "text!./style.css"], function ( qlik, $, cssContent )
 		}
 		html += "</th>";
 		return html;
-	}	
+	}
+
+	
+	var labelTotal = {
+			type: "string",
+			label: "Total Label",
+			ref: "labelTotal",
+			//expression: "always",
+			defaultValue: "Total",
+			
+	};
+
+	var totalTopBottom = {
+		type: "string",
+		component: "switch",
+		label: "Totals on Top/Bottom",
+		ref: "totalTopBottom",
+		options: [{
+			value: "top",
+			label: "Top"
+		}, {
+			value: "bottom",
+			label: "Bottom"
+		}],
+		defaultValue: "top"
+	};	
+	
+	var options = {
+					type:"items",
+					//component: "expandable-items",
+					label:"Opções",
+					items: {			
+						labelTotal:labelTotal,
+						totalTopBottom:totalTopBottom
+					}
+			
+				}
 
 	return {
 		initialProperties: {
@@ -148,14 +246,24 @@ define( ["qlik", "jquery", "text!./style.css"], function ( qlik, $, cssContent )
 				},
 				measures: {
 					uses: "measures",
-					min: 0
+					min: 0,
+					items: {
+						totalMeasure: {
+									type: "string",
+									ref: "qDef.totalMeasure",
+									label: "Total Expression",
+									expression: "always",
+									defaultValue: ""
+								}
+					}
 				},
 				sorting: {
 					uses: "sorting"
 				},
 				settings: {
 					uses: "settings"
-				}
+				},
+				options:options
 			}
 		},
 		snapshot: {
@@ -170,6 +278,8 @@ define( ["qlik", "jquery", "text!./style.css"], function ( qlik, $, cssContent )
 				colcount = hypercube.qDimensionInfo.length + hypercube.qMeasureInfo.length,
 				sortorder = hypercube.qEffectiveInterColumnSortOrder;
 			
+			
+			//console.log(layout);
 				
 			//render titles
 //			hypercube.qDimensionInfo.forEach( function ( cell ) {
@@ -186,14 +296,43 @@ define( ["qlik", "jquery", "text!./style.css"], function ( qlik, $, cssContent )
 			} );
 			html += "</tr></thead><tbody>";
 			//render data
-			html += createRows( hypercube.qDataPages[0].qMatrix, hypercube.qDimensionInfo);
+			
+			//calculate totals
+			var htmlTotal=createTotal( hypercube.qDataPages[0].qMatrix, hypercube.qDimensionInfo,hypercube.qMeasureInfo,layout.labelTotal,layout.totalTopBottom);
+			
+			//create array to put  in  table(can be more with button "more")
+			var htmlArray=[];
+
+			//push first results on array
+			htmlArray.push(createRows( hypercube.qDataPages[0].qMatrix, hypercube.qDimensionInfo,hypercube.qMeasureInfo,layout.labelTotal,layout.totalTopBottom));
+			
+			
+			
+			//html += createRows( hypercube.qDataPages[0].qMatrix, hypercube.qDimensionInfo,hypercube.qMeasureInfo,layout.labelTotal,layout.totalTopBottom);
 			html += "</tbody></table>";
 			//add 'more...' button
 			if ( hypercube.qSize.qcy > rowcount ) {
 				html += "<button class='more'>More...</button>";
 				morebutton = true;
 			}
+			//create empty table
 			$element.html( html );
+			
+			//create
+			html="";
+			for(var i = 0;i<htmlArray.length;i++)
+				html+=htmlArray[i];
+			
+			//insert Total
+			if(layout.totalTopBottom=="top")
+				html=htmlTotal+html;
+			else
+				html=html+htmlTotal;
+			
+			//insert table 
+			$element.find( "tbody" ).html( html );
+			
+			
 			if ( morebutton ) {
 				$element.find( ".more" ).on( "qv-activate", function () {
 					var requestPage = [{
@@ -207,11 +346,30 @@ define( ["qlik", "jquery", "text!./style.css"], function ( qlik, $, cssContent )
 						if ( rowcount >= hypercube.qSize.qcy ) {
 							$element.find( ".more" ).hide();
 						}
-						var html = createRows( dataPages[0].qMatrix, hypercube.qDimensionInfo );
-						$element.find( "tbody" ).append( html );
+						
+						
+						//push result from more on array;
+						htmlArray.push(createRows( dataPages[0].qMatrix, hypercube.qDimensionInfo,hypercube.qMeasureInfo,layout.labelTotal,layout.totalTopBottom));
+						//var html = createRows( dataPages[0].qMatrix, hypercube.qDimensionInfo,hypercube.qMeasureInfo,layout.labelTotal,layout.totalTopBottom);
+						
+						//create new html
+						var  html="";
+						for(var i = 0;i<htmlArray.length;i++)
+							html+=htmlArray[i];
+						
+						//totals
+						if(layout.totalTopBottom=="top")
+							html=htmlTotal+html;
+						else
+							html=html+htmlTotal;
+						//replace html
+						$element.find( "tbody" ).html( html );
 					} );
 				} );
 			}
+			
+			
+			
 			$element.find('.selectable').on('qv-activate', function() {
                     if (this.hasAttribute("data-value")) {
                         var value = parseInt(this.getAttribute("data-value"), 10),
