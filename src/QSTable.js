@@ -40,7 +40,12 @@ define( ["qlik", "jquery", "text!./style.css"], function ( qlik, $, cssContent )
 
 	
 		var tdTotal = "<tr>";
-		var tdTotalLabel=labelTotal;
+		
+		if (labelTotal === undefined )
+			var tdTotalLabel="Total";
+		else 
+			var tdTotalLabel=labelTotal;
+
 		
 		for(var i = 0;  i<dimensionInfo.length;i++){			
 			if(i==0)
@@ -103,29 +108,50 @@ define( ["qlik", "jquery", "text!./style.css"], function ( qlik, $, cssContent )
 				if ( cell.qIsOtherCell ) {
 					cell.qText = dimensionInfo[key].othersLabel;
 				}
-				htmlRows += "<td class='";
+			//	console.log (cell);
+			//	console.log (key);
+			//  console.log (dimensionInfo[key]);
+				
+				
+				//measure columns
+				htmlRows += "<td ";
+				//add  style defined for a dimension or a measure
+				if (cell.qAttrExps) {
+					if (cell.qAttrExps.qValues[0].qText) {
+					htmlRows += "style = '"+cell.qAttrExps.qValues[0].qText+"'";
+					}
+				};
+				htmlRows += " class='";
 				if ( !isNaN( cell.qNum ) ) {
 					htmlRows += "numeric ";
 				}
 				if (cell.qText === undefined) {
-				 htmlRows += "'> </td>";
+				htmlRows += "'> </td>";
 				}
 				else 
 				{
-				  if(~cell.qText.toLowerCase().indexOf('<img>')){
+				if(~cell.qText.toLowerCase().indexOf('<img>')){
 					htmlRows += "image'"+'> <img src="'+ ImgURL + cell.qText.slice(5, cell.qText.length) + '" height=' + '15' + '></td>';
-				  }
-				  else if(~cell.qText.toLowerCase().indexOf('<url>')){
+				}
+				else if(~cell.qText.toLowerCase().indexOf('<url>')){
 					var urlmark = cell.qText.toLowerCase().indexOf('<url>');
 					htmlRows += "'"+'> <a href="' + cell.qText.slice(urlmark+5, cell.qText.length) + '" target="_blank">' + cell.qText.slice(0,urlmark) + '</a></td>';
-				  }
-				  else if(~cell.qText.toLowerCase().indexOf('<app>')){
+				}
+				else if(~cell.qText.toLowerCase().indexOf('<app>')){
 					var urlmark = cell.qText.toLowerCase().indexOf('<app>');
 					htmlRows += "'"+'> <a href="' + AppBaseURL + cell.qText.slice(urlmark+5, cell.qText.length) + '" target="_blank">' + cell.qText.slice(0,urlmark) + '</a></td>';
-				  }
-				  else {
+				}
+				else {
+					
+					if (dimensionInfo[key]) {
+						htmlRows += "selectable' ";
+						htmlRows += " dim-col='" + key + "'" ;
+						htmlRows += " dim-index='" + cell.qElemNumber  + "'" ;
+					}
+					
 					htmlRows += "'>" + cell.qText + '</td>';
-				  };
+				};
+				
 				};
 			} );
 			htmlRows += '</tr>';
@@ -195,7 +221,7 @@ define( ["qlik", "jquery", "text!./style.css"], function ( qlik, $, cssContent )
 			label: "Total Label",
 			ref: "labelTotal",
 			//expression: "always",
-			defaultValue: "Total",
+			defaultValue: "Total"
 			
 	};
 
@@ -214,13 +240,29 @@ define( ["qlik", "jquery", "text!./style.css"], function ( qlik, $, cssContent )
 		defaultValue: "top"
 	};	
 	
+	var tableSelectonDimensions = {
+		type: "string",
+		component: "switch",
+		label: "Select on Dimensions",
+		ref: "tableSelectonDimensions",
+		options: [{
+			value: "no",
+			label: "No"
+		}, {
+			value: "yes",
+			label: "Yes"
+		}],
+		defaultValue: "no"
+	};	
+
 	var options = {
 					type:"items",
 					//component: "expandable-items",
 					label:"Opções",
 					items: {			
 						labelTotal:labelTotal,
-						totalTopBottom:totalTopBottom
+						totalTopBottom:totalTopBottom,
+						tableSelectonDimensions:tableSelectonDimensions
 					}
 			
 				}
@@ -242,7 +284,16 @@ define( ["qlik", "jquery", "text!./style.css"], function ( qlik, $, cssContent )
 			items: {
 				dimensions: {
 					uses: "dimensions",
-					min: 1
+					min: 1,
+					items: {
+						styleDimension: {
+							type: "string",
+							component: 'expression',
+							ref: "qAttributeExpressions.0.qExpression",
+							label: "Style",
+							expression: ""
+						}
+					}
 				},
 				measures: {
 					uses: "measures",
@@ -254,7 +305,14 @@ define( ["qlik", "jquery", "text!./style.css"], function ( qlik, $, cssContent )
 									label: "Total Expression",
 									expression: "always",
 									defaultValue: ""
-								}
+								},
+						styleMeasure: {
+							type: "string",
+							component: 'expression',
+							ref: "qAttributeExpressions.0.qExpression",
+							label: "Style",
+							expression: ""
+						}
 					}
 				},
 				sorting: {
@@ -279,7 +337,7 @@ define( ["qlik", "jquery", "text!./style.css"], function ( qlik, $, cssContent )
 				sortorder = hypercube.qEffectiveInterColumnSortOrder;
 			
 			
-			//console.log(layout);
+		//	console.log(hypercube);
 				
 			//render titles
 //			hypercube.qDimensionInfo.forEach( function ( cell ) {
@@ -370,14 +428,28 @@ define( ["qlik", "jquery", "text!./style.css"], function ( qlik, $, cssContent )
 			
 			
 			
-			$element.find('.selectable').on('qv-activate', function() {
+	/*		$element.find('.selectable').on('qv-activate', function() {
                     if (this.hasAttribute("data-value")) {
                         var value = parseInt(this.getAttribute("data-value"), 10),
                             dim = parseInt(this.getAttribute("data-dimension"), 10);
                         self.selectValues(dim, [value], true);
                         $element.find("[data-dimension='" + dim + "'][data-value='" + value + "']").toggleClass("selected");
                     }
-                });
+				});
+	*/			
+				$element.find(".selectable").on("click", function() {
+					// Get the dimension column number
+					if (layout.tableSelectonDimensions ==='yes') {
+					var dimCol = parseInt(this.getAttribute("dim-col"));
+					
+					// Get the dimension value index
+					var dimInd = parseInt(this.getAttribute("dim-index"));
+		
+					// Call selectValues with these values
+					self.selectValues(dimCol, [dimInd],true);
+					$element.find("[dim-col='" + dimCol + "'][dim-index='" + dimInd + "']").toggleClass("selected");
+					}
+				});
                 $element.find('th').on('qv-activate', function() {
                     if (this.hasAttribute("data-col")) {
                         var col = parseInt(this.getAttribute("data-col"), 10);
